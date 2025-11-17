@@ -1,4 +1,0 @@
-project_id = "cffxngeqtaycntasbenz"
-
-[functions.generate-3d-model]
-verify_jwt = false

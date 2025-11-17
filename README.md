@@ -1,73 +1,147 @@
-# Welcome to your Lovable project
+# KEYCHAN Studio
 
-## Project info
+Convert your 2D images into 3D printable keychains.
 
-**URL**: https://lovable.dev/projects/0c05adbd-5aa0-4050-ae53-6889a5c29f6b
+## Tech Stack
 
-## How can I edit this code?
+- **Framework:** Next.js 15 (App Router)
+- **Backend:** Convex (serverless, stateful backend)
+- **3D Rendering:** React Three Fiber + Drei
+- **3D Processing:** Three.js, Potrace, Three-CSG-TS, Three-STL-Exporter
+- **Styling:** Tailwind CSS + shadcn/ui
+- **Language:** TypeScript
 
-There are several ways of editing your application.
+## Getting Started
 
-**Use Lovable**
+### Prerequisites
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/0c05adbd-5aa0-4050-ae53-6889a5c29f6b) and start prompting.
+- Node.js 18+ 
+- npm or yarn
+- Convex account (free at [convex.dev](https://convex.dev))
 
-Changes made via Lovable will be committed automatically to this repo.
+### Installation
 
-**Use your preferred IDE**
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd keychan-studio
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+3. **Set up Convex**
+   ```bash
+   npx convex dev
+   ```
+   This will:
+   - Create a new Convex project (or connect to existing)
+   - Generate the Convex configuration
+   - Set up your deployment URL
 
-Follow these steps:
+4. **Configure environment variables**
+   
+   Create a `.env.local` file in the root directory:
+   ```env
+   NEXT_PUBLIC_CONVEX_URL=your_convex_deployment_url_here
+   ```
+   
+   The Convex CLI will provide this URL when you run `npx convex dev`.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+5. **Run the development server**
+   ```bash
+   npm run dev
+   ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+6. **Open your browser**
+   
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Project Structure
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+keychan-studio/
+├── app/                    # Next.js App Router pages
+│   ├── layout.tsx         # Root layout with Convex provider
+│   ├── page.tsx           # Home page
+│   ├── collections/       # Collections page
+│   └── pricing/           # Pricing page
+├── components/            # React components
+│   ├── ConvexClientProvider.tsx
+│   ├── CollectionsContent.tsx
+│   ├── PricingContent.tsx
+│   └── ...
+├── convex/                # Convex backend
+│   ├── generate.ts        # 3D conversion action
+│   ├── keychains.ts       # Database mutations/queries
+│   ├── schema.ts          # Database schema
+│   └── storage.ts         # File upload mutations
+├── src/
+│   ├── components/       # UI components (shadcn/ui)
+│   └── lib/              # Utilities
+└── public/               # Static assets
 ```
 
-**Edit a file directly in GitHub**
+## Architecture
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Backend (Convex)
 
-**Use GitHub Codespaces**
+All backend logic is handled by Convex:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- **Actions** (`convex/generate.ts`): Heavy 3D processing (potrace, extrusion, CSG)
+- **Mutations** (`convex/keychains.ts`, `convex/storage.ts`): Database writes and file uploads
+- **Queries** (`convex/keychains.ts`): Database reads
 
-## What technologies are used for this project?
+### Frontend (Next.js)
 
-This project is built with:
+- **App Router**: File-based routing
+- **Client Components**: Marked with `"use client"` directive
+- **Convex Hooks**: `useQuery`, `useMutation`, `useAction` for backend integration
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Key Features
 
-## How can I deploy this project?
+1. **Image Upload**: Upload 2D images (PNG, JPG) via Convex storage
+2. **3D Conversion**: Convert images to 3D STL files using:
+   - Potrace for bitmap tracing
+   - Three.js ExtrudeGeometry for 3D extrusion
+   - Three-CSG-TS for boolean operations (keychain hole)
+3. **Customization**: Adjust thickness, text, hole position
+4. **3D Preview**: Real-time preview using React Three Fiber
+5. **Collections**: Browse and download community keychains
 
-Simply open [Lovable](https://lovable.dev/projects/0c05adbd-5aa0-4050-ae53-6889a5c29f6b) and click on Share -> Publish.
+## Development
 
-## Can I connect a custom domain to my Lovable project?
+### Running Convex in Development
 
-Yes, you can!
+```bash
+npm run convex:dev
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+This runs Convex in watch mode, automatically syncing your backend changes.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Building for Production
+
+```bash
+npm run build
+npm start
+```
+
+### Deploying Convex
+
+```bash
+npm run convex:deploy
+```
+
+## Notes
+
+- The 3D conversion happens entirely on the Convex backend
+- Files are stored in Convex storage (not local filesystem)
+- The app uses Convex's real-time database for the collections page
+- Real-time texture preview for instant feedback
+- Interactive hole positioning with click-and-drag
+
+## License
+
+MIT
